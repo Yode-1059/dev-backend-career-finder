@@ -1,13 +1,10 @@
-import React, { useState } from "react";
-// import { useUser } from "../lib/user";
-import Link from "next/link";
+import { useState } from "react";
+
 import { Post } from "../types/post";
-import Image from "next/image";
 import ReactionList from "./addReaction";
 import CurrentReactionList from "./current-reaction-list";
 
 const PostItemCard = ({ post }: { post: Post }) => {
-    //   const user = useUser(post.authorId);
     const [reactionTab, setReactionTab] = useState<boolean>(false);
 
     const reactionOpen = () => {
@@ -22,8 +19,8 @@ const PostItemCard = ({ post }: { post: Post }) => {
         </h2>
         <p>{post.body.result}</p>
         <p>{post.id}</p>
-        <button onClick={reactionOpen}>+</button>
-        <CurrentReactionList post={post.id} />
+        <CurrentReactionList post={post.id}/>
+        <button onClick={reactionOpen} style={{marginBottom:"10px"}}>+</button>
         {reactionTab && <ReactionList  post={post.id} />}
       </div>
     </>

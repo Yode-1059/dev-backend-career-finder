@@ -1,7 +1,6 @@
-import { FieldValue, arrayRemove, arrayUnion, doc, getDoc, increment, updateDoc } from "firebase/firestore"
+import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore"
 import { db } from "../firebase/firebase"
-import Reaction  from "../types/reaction"
-import { async } from "@firebase/util"
+import Reaction from "../types/reaction"
 
 export const useToggleReaction = () => {
 
@@ -27,6 +26,7 @@ export const useToggleReaction = () => {
                 })
             })
         } else {
+            console.log(reaction,url)
             updateDoc(ref, {
                 reactions: arrayUnion({
                     reaction, url: url, value: 1
@@ -39,7 +39,6 @@ export const useToggleReaction = () => {
     }
     const ToggleReaction = async (uid: string, reaction: string,url:string,url_old:string, ref: any, reaction_old: string,post:string) => {
         const userRef = doc(db, "users", uid)
-        // try {
         updateDoc(userRef, {
             reactions:arrayRemove({ reaction: reaction_old, post:post,url:url_old})
         })

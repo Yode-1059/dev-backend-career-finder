@@ -12,8 +12,9 @@ const ReactionList = ({ post}: { post: string }) => {
   useEffect(() => {
     const getReaction = async () => {
       const querySnapshot = await getDocs(collection(db, "reactionList"));
+      console.log(querySnapshot.docs)
       const data = querySnapshot.docs.map(doc => ({
-        id: doc.id,
+        reaction: doc.data().id,
         url: doc.data().url,
         value:doc.data().value,
         ...doc.data(),
@@ -26,11 +27,10 @@ const ReactionList = ({ post}: { post: string }) => {
   const addReaction = async (post: string, reaction: string, url:string) => {
     if (user) {
       const docRef = doc(db, "posts_d", post)
-      const reactionData: Array<Reaction> = (await getDoc(docRef)).data().reactions
       const userRef = doc(db, "users", user.id)
       const userData: Array<{ post: string, reaction: string ,url:string}> = (await getDoc(userRef)).data().reactions
       const existingReaction = userData?.find(obj => obj.post === post);
-
+      console.log(reaction)
       if (existingReaction) {
           console.log("toggle")
           ToggleReaction(user.id, reaction,url,existingReaction.url, docRef,existingReaction.reaction,post);
@@ -41,12 +41,12 @@ const ReactionList = ({ post}: { post: string }) => {
   }
 
   return (
-    <div>
-    <p>Reaction</p>
+    <div style={{width:"200px",display:"flex","justifyContent":"space-between",backgroundColor:"whitesmoke",border:"1px solid black",padding:"10px"}}>
     {reactions.map((reaction: Reaction, index: number) => (
-      <div key={index}>
-      <button onClick={()=>addReaction(post, reaction.id,reaction.url)}>
-      <img src={reaction.url} alt="" />
+      <div key={index} style={{width:"55px"}}>
+      <button onClick={()=>addReaction(post, reaction.reaction,reaction.url)}>
+          <img src={reaction.url} alt="" style={{ width: "55px", height: "55px" }} />
+          <p>{reaction.reaction}</p>
       </button>
       </div>
       ))}
