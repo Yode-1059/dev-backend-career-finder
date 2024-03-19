@@ -1,7 +1,7 @@
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase/firebase";
 import { User } from "../types/user";
-import { addDoc, collection,doc } from "firebase/firestore";
+import { setDoc,addDoc, collection, doc,getDoc } from "firebase/firestore";
 
 
 export const login = () => {
@@ -15,30 +15,30 @@ export const login = () => {
 };
 
 
-onAuthStateChanged(auth, (user) => {
-  console.log("new",user)
+onAuthStateChanged(auth, async (user) => {
   if (user) {
-    if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-
-      const ref = doc(collection(db, "users"));
+        if (user.metadata.creationTime === user.metadata.lastSignInTime) {
       const newUser = {
-        id:ref.id,
         avatarURL: user.photoURL || "",
         name: user.displayName || "Unknown",
-        nickname:user.displayName || "Unknown",
-        reactions:[],
-        storage:[]
+        nickname: user.displayName || "Unknown",
+        reactions: [],
+        storage: [],
       };
-      addDoc(collection(db, "users"), newUser)
-        .then(() => {
-          console.log("新しいユーザーデータがFirestoreに追加されました。");
-        })
-        .catch((error) => {
-          console.error("Firestoreへの新しいユーザーデータの追加中にエラーが発生しました:", error);
-        });
+      
+      const userDocRef = doc(collection(db, "users"), user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      
+      if (!userDocSnap.exists()) {
+        await setDoc(userDocRef, newUser);
+        console.log("新しいユーザーデータがFirestoreに追加されました。UID:", user.uid);
+      } else {
+        console.log("既にユーザーデータが存在します。UID:", user.uid);
+      }
     }
   }
 });
+
 export const logout = () => {
   signOut(auth).then(() => {
     alert("logout");
